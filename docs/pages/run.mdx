@@ -1,0 +1,78 @@
+# 명령어 실행하는 법 (완전 초보자용)
+
+이 가이드에 나오는 `python ...` 같은 명령어를 **어디에 입력하는지** 모르겠다면 이 페이지부터 보세요.
+딱 4가지만 순서대로 하면 됩니다: **① 파이썬 설치 → ② 코드 내려받기 → ③ 터미널 열기 → ④ 명령 입력.**
+
+> 💡 "터미널"이란 명령어를 타이핑해서 컴퓨터에 시키는 **검은 입력 창**이에요. 마우스 클릭 대신
+> 글자로 명령한다고 생각하면 됩니다.
+
+## ① 파이썬(Python) 설치
+
+파이썬은 이 스크립트를 실행해 주는 프로그램입니다.
+
+1. 먼저 설치돼 있는지 확인 — 아래 ③에서 터미널을 연 뒤 이렇게 입력하고 Enter:
+   ```bash
+   python --version
+   ```
+   `Python 3.11.x` 처럼 숫자가 나오면 이미 설치된 것입니다. (Windows에서 안 되면 `py --version`)
+2. 없거나 오류가 나면 → [python.org/downloads](https://www.python.org/downloads/) 에서 설치.
+   **Windows는 설치 첫 화면에서 ★"Add python.exe to PATH" 체크박스를 꼭 켜세요.** (안 켜면 나중에 안 됨)
+
+## ② 코드 내려받기 (GitHub에서)
+
+**방법 A — 쉬움 (초보자 추천):**
+1. [github.com/aiebrain/gads-demandgen-setup](https://github.com/aiebrain/gads-demandgen-setup) 접속
+2. 초록색 **`< > Code`** 버튼 클릭 → **Download ZIP**
+3. 받은 zip 파일을 **압축 풀기** (예: 바탕화면에)
+
+**방법 B — git이 있으면:**
+```bash
+git clone https://github.com/aiebrain/gads-demandgen-setup.git
+```
+
+## ③ 터미널 열기 + 스크립트 폴더로 이동
+
+명령은 **`skills/google-ads-demandgen-setup/scripts`** 폴더 안에서 실행합니다.
+
+### Windows
+
+1. 압축 푼 폴더를 열어 `skills` → `google-ads-demandgen-setup` → `scripts` 폴더까지 들어갑니다.
+2. ★**가장 쉬운 방법:** 그 `scripts` 폴더 창의 위쪽 **주소 표시줄을 마우스로 클릭**해서 파란색으로
+   바뀌면, 거기에 **`powershell`** 이라고 타이핑하고 **Enter**. → 바로 그 폴더에서 터미널이 열립니다.
+3. (다른 방법: 시작 메뉴에 `PowerShell` 검색 → 열기 → `cd "폴더경로"` 입력. 경로는 폴더를
+   Shift+마우스 우클릭 → "경로로 복사"로 얻습니다.)
+
+### Mac
+
+1. Spotlight(⌘ + Space)에 **터미널** 입력 → 열기
+2. 터미널에 `cd ` (cd 뒤에 한 칸) 를 입력한 뒤, `scripts` 폴더를 터미널 창 위로 **드래그** → Enter
+
+## ④ 명령 입력
+
+이제 터미널에 아래를 입력하고 **Enter**:
+
+```bash
+python bootstrap.py
+```
+
+(Windows에서 `python`이 안 먹으면 `py bootstrap.py` 로 시도하세요.)
+
+처음부터(계정도 없이) 시작한다면 그 전에 안내 마법사를 먼저 돌려도 됩니다:
+
+```bash
+python guided_setup.py
+```
+
+## 실행 중에 나오는 것들 — 당황하지 마세요
+
+- **`gcloud 를 지금 자동 설치할까요? [y/N]`** → `y` 입력 후 Enter
+- **긴 주소(`https://accounts.google.com/...`)가 뜨거나 브라우저가 열림** → 그 주소를 브라우저에 붙여넣고,
+  본인 구글 계정으로 **로그인 → 허용**. ("확인하지 않은 앱" 경고가 나오면 **고급 → 계속**)
+- **`Please visit this URL...`** → 바로 그 뒤 주소가 OAuth 동의 주소입니다
+- 중간에 무언가 물어보면 대부분 그냥 **Enter**(기본값) 또는 화면 안내대로 입력하면 됩니다
+- 다 끝나면 **`디맨드젠 광고 설정 준비 완료 ✅`** 가 보입니다
+
+## 빨간 `[X]` 오류가 나면?
+
+스크립트는 오류가 나면 **원인과 해결 방법을 바로 아래에 같이 출력**합니다. 그 안내대로 따라 하세요.
+그래도 막히면 [문제 해결](/troubleshooting) 페이지를 참고하세요.
