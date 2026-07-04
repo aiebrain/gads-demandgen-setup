@@ -1,0 +1,64 @@
+# 문제 해결
+
+스크립트가 실패하면 대부분 `_common.py`의 자동 진단이 원인·해결을 함께 출력합니다. 여기서는 실제로
+자주 걸리는 지점을 정리합니다.
+
+## 개발자 토큰 관련
+
+### "The developer token is not valid" (미승인이 아니라 값 오류)
+토큰 문자열이 틀렸거나(오타), 재발급됐거나, 발급한 MCC와 `GOOGLE_ADS_LOGIN_CUSTOMER_ID`가 다른 계정.
+API 센터에서 토큰을 **다시 복사**해 `.env`에 정확히 넣으세요. 특히 대문자 `I`(아이) / 소문자 `l`(엘) 혼동 주의.
+
+### `DEVELOPER_TOKEN_NOT_APPROVED` / "explorer access"
+개발자 토큰이 Test(Explorer) 등급이라 실계정 쓰기·연결 수락이 막힘. API 센터에서
+**Basic 액세스**를 신청하세요(승인 1~3영업일). 데이터 조회는 Test로도 가능합니다.
+
+## OAuth 관련
+
+### `access_denied` (403) — "테스트 중"
+OAuth 동의 화면이 "테스트 중"인데 본인 계정이 **테스트 사용자에 등록되지 않음**. GCP 콘솔의
+OAuth 동의 화면 → 테스트 사용자에 본인 이메일을 추가한 뒤 같은 URL을 다시 여세요.
+
+### `invalid_grant`
+리프레시 토큰 만료/취소. `python bootstrap.py --reauth`로 새로 발급하세요.
+
+### 동의 URL이 안 보이고 멈춤
+자식 프로세스 출력이 버퍼링된 경우. `PYTHONUNBUFFERED=1`로 실행하면 URL이 즉시 출력됩니다.
+
+## 배포 / gcloud
+
+### 결제 미연결
+Cloud Run은 결제 연결된 프로젝트에서만 동작. [결제 콘솔](https://console.cloud.google.com/billing)에서 연결.
+
+### 시크릿 접근 권한 (컨테이너 부팅 실패)
+Cloud Run 런타임 서비스계정에 `secretAccessor` 필요. 배포 스크립트가 자동 부여하지만 실패 시 수동으로:
+
+```bash
+gcloud secrets add-iam-policy-binding google-ads-adc-json \
+  --member serviceAccount:<PROJECT_NUMBER>-compute@developer.gserviceaccount.com \
+  --role roles/secretmanager.secretAccessor
+```
+
+### gcloud가 설치돼 있는데 "미설치"로 나옴
+PATH에 없을 뿐. `_common.ensure_gcloud_on_path()`가 알려진 설치 경로를 탐색해 PATH에 주입합니다.
+
+## Claude Code 등록
+
+### "cannot be launched inside another Claude Code session"
+Claude Code 세션 안에서 `claude mcp add`를 실행하면 `CLAUDECODE` 때문에 막힘. 스크립트는 자동으로
+`CLAUDECODE`를 빼고 실행합니다. 수동이라면:
+
+```bash
+env -u CLAUDECODE claude mcp add --transport http --scope user google_ads_direct <URL> \
+  --header "Authorization: Bearer <TOKEN>"
+```
+
+## 계정 구조
+
+### 일반 Gmail인데 서비스 계정 방식이 안 됨
+Google Ads API의 서비스 계정 인증은 **Google Workspace 도메인 + 도메인 전체 위임**이 있어야만 동작합니다.
+일반 `@gmail.com`은 **OAuth 방식**(이 도구의 기본)을 쓰세요. 서비스 계정 JSON으로는 `USER_PERMISSION_DENIED`가 납니다.
+
+### 고객 ID 오류 (`CUSTOMER_NOT_FOUND`)
+`GOOGLE_ADS_CUSTOMER_ID`에 **관리자(MCC) ID**를 넣는 실수. 실제 광고가 도는 **광고계정 ID**를 넣어야 합니다.
+둘 다 하이픈 없이 숫자.

@@ -1,0 +1,66 @@
+# 셋업 가이드 (0~4단계)
+
+완전 처음이어도 괜찮습니다. `python guided_setup.py`를 실행하면 아래 순서를 화면에서 그대로
+안내합니다. **자동화가 불가능한 웹 작업**만 사람이 직접 하고, 나머지는 스크립트가 처리합니다.
+
+> **가장 중요한 규칙:** 0~4번과 결제까지 **전부 "같은 구글 계정 하나"로** 진행하세요.
+> 계정을 섞으면 로그인 차단·권한 오류(`PERMISSION_DENIED`)가 납니다. 실제로 가장 흔한 원인입니다.
+
+## 0. 구글 계정(이메일) 준비 — 가장 먼저
+
+1. 이미 Gmail이 있으면 그 계정 하나로 진행합니다.
+2. 없으면 [accounts.google.com/signup](https://accounts.google.com/signup)에서 만듭니다.
+3. **일반 `@gmail.com`이면 충분**합니다. (회사 도메인 Workspace 계정 불필요)
+
+## 1. 관리자(MCC) 계정 만들기 — 안내 (자동화 불가)
+
+reCAPTCHA가 있는 웹 가입이라 스크립트로 만들 수 없습니다. 스크립트가 페이지를 열고 아래를 안내합니다.
+
+1. [ads.google.com/home/tools/manager-accounts](https://ads.google.com/home/tools/manager-accounts) 접속
+2. **"관리자 계정 만들기"** 클릭
+3. 계정 이름 입력 (예: `홍길동_광고관리`)
+4. 용도: 잘 모르면 **"다른 사람의 계정 관리"** 추천
+5. 국가=대한민국, 시간대=서울, 통화=KRW **(나중에 못 바꿈)**
+6. **"로봇이 아닙니다"** 체크 → 제출 → "계정 탐색하기"
+7. 상단의 10자리 번호(예: `123-456-7890`)가 **MCC ID** → 스크립트에 붙여넣기
+
+## 2. 개발자 토큰 신청 — 안내 (Google 심사 1~3일)
+
+1. **관리자 계정으로 로그인**한 상태에서 [ads.google.com/aw/apicenter](https://ads.google.com/aw/apicenter) 접속
+2. **"토큰 신청"** → 이름/웹사이트/사용목적 입력 → 약관 동의 → 제출
+3. 화면의 **22자리 개발자 토큰** 복사
+
+> 처음엔 **Test(Explorer) 등급**입니다. 실제 광고 **생성**까지 하려면 같은 페이지에서
+> **Basic 액세스**를 신청해야 하고 승인에 1~3영업일 걸립니다. 데이터 **조회**만이면 Test로도 됩니다.
+>
+> ⚠️ 토큰 복사 시 대문자 `I`(아이)와 소문자 `l`(엘)을 혼동하지 마세요. 아주 흔한 오류입니다.
+
+## 3. GCP 프로젝트 + 결제 + Ads API — 자동
+
+이 단계는 `guided_setup.py`가 `gcloud`로 **자동 처리**합니다.
+
+- 프로젝트 생성 (`gcloud projects create`)
+- 결제 계정 목록 표시 → 선택 연결
+- Google Ads API 활성화 (`gcloud services enable googleads.googleapis.com`)
+
+결제 계정이 아예 없을 때만 [console.cloud.google.com/billing](https://console.cloud.google.com/billing)에서
+카드를 등록해 하나 만든 뒤 다시 실행하면 됩니다. (Cloud Run은 무료 한도가 넉넉해 실제 청구는 거의 없음)
+
+## 4. OAuth 클라이언트 JSON — 반자동
+
+콘솔에서 생성은 수동, 이후 복사는 자동입니다.
+
+1. [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials) 접속
+2. 처음이면 **OAuth 동의 화면** 먼저: User type=**External**, 그리고
+   ★**"테스트 사용자"에 본인 구글 이메일을 반드시 추가** (안 하면 로그인 때 `403 액세스 차단됨`)
+3. **사용자 인증 정보 → OAuth 클라이언트 ID → 데스크톱 앱** → 생성
+4. **JSON 다운로드** → 파일 경로를 스크립트에 붙여넣기
+
+## 이후 — 자동
+
+```bash
+python bootstrap.py
+```
+
+OAuth 동의(브라우저 1회) → Cloud Run 배포 → Claude Code 등록 → 디맨드젠 검증까지 자동입니다.
+막히면 [문제 해결](/troubleshooting)을 참고하세요.

@@ -1,0 +1,18 @@
+{
+  "name": "gads-demandgen-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Google Ads Demand Gen 셋업 가이드 문서 사이트 (Nextra)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.2.35",
+    "nextra": "3.0.15",
+    "nextra-theme-docs": "3.0.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

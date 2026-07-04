@@ -1,0 +1,63 @@
+# 사용법
+
+## 스크립트 구성
+
+| 스크립트 | 역할 |
+|----------|------|
+| `guided_setup.py` | from-zero 마법사: 구글계정·MCC·토큰(안내) / GCP·Ads API(자동) / OAuth 클라이언트(반자동) |
+| `install_gcloud.py` | gcloud CLI 자동 설치 (winget / brew / 공식 스크립트) + 로그인·프로젝트 설정 |
+| `preflight.py` | 환경 진단 — Python·gcloud·로그인·결제·설정 파일 상태 리포트 |
+| `bootstrap.py` | 원커맨드: gcloud설치 → 진단 → 의존성 → OAuth → 배포 → 등록 → 검증 |
+| `connect_new_pc.py` | 새 PC: URL+베어러 토큰만으로 등록 + 상태 확인 |
+| `verify_demandgen.py` | 디맨드젠 설정 가능 검증 (인증·읽기 + validate_only 쓰기, 과금 없음) |
+| `link_account.py` | 광고계정을 MCC 아래로 연결 (초대 API + Test 등급이면 UI 수락 안내) |
+| `_common.py` | 공통 헬퍼 + 에러 자동 진단 |
+
+## 첫 PC — 최초 1회 구축
+
+```bash
+cd skills/google-ads-demandgen-setup/scripts
+python guided_setup.py     # (선택) 계정·프로젝트 준비
+python bootstrap.py        # 배포·연결·검증
+```
+
+완료되면 **MCP URL**과 **베어러 토큰**이 `~/.google-ads-mcp/connection.json`에 저장됩니다.
+
+## 다른 PC — 이후 반복 (서버 재배포 없음)
+
+```bash
+python connect_new_pc.py                              # connection.json 자동 사용
+python connect_new_pc.py --url <MCP_URL> --token <BEARER>
+```
+
+`connection.json`을 클라우드로 동기화해 두면 인자 없이도 연결됩니다. 같은 서버를 쓰므로
+디맨드젠 설정도 첫 PC와 동일하게 가능합니다.
+
+## 디맨드젠 설정 가능 검증
+
+```bash
+python verify_demandgen.py --customer-id <광고계정_ID>
+```
+
+인증·읽기(self-test) + 디맨드젠 툴 존재 + **validate_only 쓰기 확인(실제 생성/과금 없음)** 을 거쳐
+"디맨드젠 광고 설정 준비 완료"를 확인합니다.
+
+## 관리자(MCC)에 광고계정 연결 (선택)
+
+```bash
+python link_account.py --manager <MCC_ID> --client <광고계정_ID>
+python link_account.py --check --manager <MCC_ID> --client <광고계정_ID>
+```
+
+MCC → 광고계정 **초대(PENDING)** 를 API로 보내고, 자동 수락을 시도합니다. 개발자 토큰이
+**Test 등급이면 API 수락이 막히므로**, 스크립트가 **Google Ads UI에서 직접 수락하는 단계**를
+출력합니다. UI 수락은 토큰 등급과 무관하게 동작합니다.
+
+## 실사용 (셋업 이후)
+
+Claude Code에서 **읽기부터** 확인하세요: "내 구글애즈 계정 목록 보여줘". 그다음 디맨드젠 캠페인은
+**PAUSED로 생성**해 UI 확인 후에만 활성화합니다. 디맨드젠 API 제약:
+
+- 입찰은 전환/클릭 기반 (수동 CPC 불가). 전환추적 없으면 `MAXIMIZE_CLICKS`.
+- 영상은 YouTube에 먼저 업로드한 뒤 video ID로 참조.
+- 이미지는 URL로 전달 (모델에 base64로 넣지 말 것).

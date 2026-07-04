@@ -1,0 +1,48 @@
+# Google Ads Demand Gen 셋업 자동화
+
+Google Ads **디맨드젠(Demand Gen)** 광고를 설정할 수 있는 환경을, 손으로 클릭하는 대신
+**자동화 스크립트**로 구축하고 **어느 PC에서든 동일하게 재현**되게 만드는 도구입니다.
+
+일반 Gmail 계정 + OAuth 인증을 전제로, Cloud Run에 디맨드젠 가능한 MCP 서버를 배포하고
+Claude Code에 연결합니다. 가능한 건 자동으로, 웹 전용 단계는 **완전 초보자 기준으로 안내**합니다.
+
+## 핵심 아이디어
+
+- 서버 로직(디맨드젠 툴 포함)은 `google-ads-direct-mcp` 스킬을 재사용하고, 이 도구는 그 위에서
+  도는 **오케스트레이션·검증·에러 진단 레이어**입니다.
+- 서버는 Cloud Run에 하나만 배포하면 되고, 다른 PC는 URL과 토큰만 등록하면 동일하게 동작합니다.
+
+```text
+Claude Code (어느 PC든)
+   → https://<your-service>.run.app/mcp   (Authorization: Bearer <token>)
+   → Cloud Run (MCP 서버)
+   → Google Ads API
+```
+
+## 자동 vs 안내 (솔직한 경계)
+
+| 단계 | 처리 |
+|------|------|
+| 구글 계정 · MCC 생성 · 개발자 토큰 | 📖 안내 (웹 가입 · reCAPTCHA · Google 심사라 자동화 불가) |
+| gcloud 설치 · GCP 프로젝트 · 결제 · Ads API | ⚙️ 자동 |
+| OAuth 동의 · Cloud Run 배포 · 등록 · 검증 | ⚙️ 자동 |
+
+## 빠른 시작
+
+```bash
+cd skills/google-ads-demandgen-setup/scripts
+
+# 처음부터(계정도 없음)라면 — 웹 전용 단계 안내 + GCP 자동
+python guided_setup.py
+
+# 원커맨드 구축 — gcloud설치 → OAuth → Cloud Run 배포 → 등록 → 검증
+python bootstrap.py
+```
+
+다음으로 [셋업 가이드](/setup)를 따라가세요.
+
+## 안전 원칙
+
+- 비밀값(`.env`, `google_ads_adc.json`, `mcp_bearer_token.txt`, `connection.json`)은 **절대 커밋 금지**.
+- 새 캠페인·광고는 기본 **PAUSED**, 활성화·삭제는 명시적 확인 인자 필요.
+- 검증은 `validate_only`(과금·생성 없음)를 기본으로 합니다.

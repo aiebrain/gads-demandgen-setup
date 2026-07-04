@@ -1,0 +1,19 @@
+# secrets / generated — never commit
+**/.env
+**/google_ads_adc.json
+**/google_ads_oauth_client.json
+**/mcp_bearer_token.txt
+**/connection.json
+**/last_deploy.json
+
+# python
+**/__pycache__/
+*.pyc
+
+# node / next / vercel (docs site)
+node_modules/
+.next/
+out/
+.vercel/
+*.log
+.DS_Store
