@@ -1,5 +1,7 @@
 # Google Ads Demand Gen 셋업 자동화
 
+> 📖 **가이드 문서 사이트: https://gads-demandgen-setup.vercel.app**
+
 Google Ads **디맨드젠(Demand Gen)** 광고를 설정할 수 있는 환경을, 손으로 클릭하는 대신
 **자동화 스크립트**로 구축하고 **어느 PC에서든 동일하게 재현**되게 만드는 도구 모음입니다.
 일반 Gmail 계정 + OAuth 인증을 전제로, Cloud Run에 디맨드젠 가능한 MCP 서버를 배포하고
